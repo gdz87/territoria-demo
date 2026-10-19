@@ -32,6 +32,6 @@ async function init(){await T.initBit();document.title=C.marca+" · Demo";T.$("#
  T.$("#reset").onclick=()=>{if(confirm("¿Restablecer los datos de la demo en este equipo?")){T.reset();location.hash="";location.reload()}};
  T.aplicaTema();T.pintaSync();addEventListener("hashchange",()=>T.render(location.hash.replace(/^#\/?/,"")));
  declarar(S.rol,()=>{});T.render(location.hash.replace(/^#\/?/,""));presPanel();
- if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{})}
+ if("serviceWorker" in navigator&&location.protocol.startsWith("http")&&!window.SINGLE_FILE)navigator.serviceWorker.register("sw.js").catch(()=>{})}
 init();
 })();
