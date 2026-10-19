@@ -27,7 +27,7 @@ T.plazo=tipo=>tipo=="Consulta"?10:15;  // Ley 1581, arts. 14 y 15
 // SHA-256 (WebCrypto o respaldo JS)
 T.sha=async bytes=>{try{if(crypto&&crypto.subtle){const b=await crypto.subtle.digest("SHA-256",typeof bytes=="string"?new TextEncoder().encode(bytes):bytes);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}}catch(e){}return window.sha256hex(typeof bytes=="string"?bytes:new Uint8Array(bytes))};
 // Bitácora encadenada (precargada con eventos ficticios)
-T.log=async(accion,detalle,rol,t)=>{const prev=S.bit.length?S.bit[S.bit.length-1].hash:"0".repeat(64);const e={t:t||new Date().toISOString(),rol:rol||S.rol,accion,detalle,prev};e.hash=await T.sha(prev+e.t+e.rol+e.accion+e.detalle);S.bit.push(e);T.save();return e};
+let _cola=Promise.resolve();T.log=(accion,detalle,rol,t)=>(_cola=_cola.then(()=>_log(accion,detalle,rol,t)));const _log=async(accion,detalle,rol,t)=>{const prev=S.bit.length?S.bit[S.bit.length-1].hash:"0".repeat(64);const e={t:t||new Date().toISOString(),rol:rol||S.rol,accion,detalle,prev};e.hash=await T.sha(prev+e.t+e.rol+e.accion+e.detalle);S.bit.push(e);T.save();return e};
 T.verificar=async()=>{let prev="0".repeat(64);for(const e of S.bit){const h=await T.sha(prev+e.t+e.rol+e.accion+e.detalle);if(e.prev!==prev||h!==e.hash)return false;prev=e.hash}return true};
 T.initBit=async()=>{if(S.bit)return;S.bit=[];for(const [t,r,a,d] of D.bitacora)await T.log(a,d,r,new Date(t).toISOString())};
 // Cola sin conexión

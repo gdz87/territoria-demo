@@ -2,7 +2,7 @@
 window.CONFIG = {
   marca: "Territoria",
   lema: "Votos verificados, campaña en regla",
-  prefijo: "terr02_",
+  prefijo: "terr03_",
   campana: "Campaña Laura Camargo · Asamblea de Boyacá 2027",
   candidato: "Laura Camargo Niño",
   partido: "Movimiento Raíces Boyacenses",          // ficticio, no corresponde a ningún partido real
@@ -29,5 +29,6 @@ window.CONFIG = {
     alojamiento: "servidores en Brasil o EE. UU. con nivel adecuado de protección (por verificar ante la SIC)",
     conservacion: "hasta el 31-dic-2027 (cierre de la rendición de cuentas); luego se suprimen"
   },
+  seguridad: { umbralPago: 2000000 },            // pagos desde este valor exigen segundo canal
   ia: { proxy: "https://territoria-api.gdz87.workers.dev", modelo: "auto" }
 };

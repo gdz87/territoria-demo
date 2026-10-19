@@ -1,4 +1,4 @@
-/* Territoria v0.2 · vistas: inicio, tablero, estrategia, red, simpatizantes */
+/* Territoria v0.3 · vistas: inicio, tablero, estrategia, red, simpatizantes */
 (function(){
 const T=window.T,{C,D,S,H,fmt,pct,ini}=T;
 const sum=(a,k)=>a.reduce((s,x)=>s+x[k],0);
@@ -20,7 +20,7 @@ return `<section class="hero" style="--pc:${C.colorPartido}"><div class="row" st
 <h1>${S.rol=="candidato"?"Hola, "+H(C.candidato.split(" ")[0])+" 👋":"Hola · "+H(r.n)}</h1><p class="sub"><b>${H(C.lema)}.</b> Faltan <b>${fmt(dias)}</b> días para la elección del ${T.fecha(C.fechaEleccion)} (por verificar).</p>
 <div class="row" style="flex-wrap:wrap"><a class="btn pri" href="#/${apps[0][0]}">Abrir ${H(apps[0][2])}</a><button class="btn" id="pres-ini" type="button">▶ Modo presentación (10 min)</button></div></section>
 <h2>Tus aplicaciones</h2><div class="apps">${apps.map(([c,i,n,d])=>`<a class="app" href="#/${c}" data-app="${c}"><span class="ic">${i}</span><b>${H(n)}</b><span>${H(d)}</span></a>`).join("")}</div>
-<details class="card roadmap" style="margin-top:14px"><summary><b>🧭 Hoja de ruta</b> <span class="muted small">· ${T.ROADMAP.length} aplicaciones más de la suite (fases 2 y 3)</span></summary><div class="list" style="margin-top:10px">${T.ROADMAP.map(([c,i,n,d])=>`<div class="item" style="cursor:default"><span class="ic">${i}</span><span><b>${H(n)}</b><br><span class="muted small">${H(d)}</span></span></div>`).join("")}</div></details>
+<details class="card roadmap" style="margin-top:14px"><summary><b>🗺 Hoja de ruta</b> <span class="muted small">· ${T.ROADMAP.length} funciones más de la suite (fases 2 y 3)</span></summary>${["Fase 2","Fase 3"].map(f=>`<h3 class="small" style="margin:12px 0 4px">${f}</h3><div class="list">${T.ROADMAP.filter(r=>(r[4]||"Fase 2")==f).map(([c,i,n,d])=>`<div class="item" style="cursor:default"><span class="ic">${i}</span><span><b>${H(n)}</b><br><span class="muted small">${H(d)}</span></span></div>`).join("")}</div>`).join("")}</details>
 <p style="margin-top:18px" class="muted small">Marca provisional configurable · <button class="btn sm" type="button" id="reset2">↺ Restablecer datos de la demo</button></p>`};
 // ---------- Tablero ----------
 T.V.TABLERO=()=>{const c=T.calc(),M=D.municipios,meta=sum(M,"meta"),prom=sum(M,"prometidos"),ver=sum(M,"verificados"),conf=sum(M,"confirmados"),est=c.votosCand;
