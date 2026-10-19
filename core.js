@@ -60,7 +60,7 @@ let actual="";T.ruta=()=>actual;T.rerender=()=>T.render(actual);
 T.render=ruta=>{actual=ruta||"";const c=actual.split("?")[0];const el=T.$("#main");let html;const a=T.appDe(c);
  if(!c||!a)html=T.V.inicio();else if(!T.puede(c))html=`<section class="hero"><h1>🔒 Sin permiso</h1><p class="sub">El rol <b>${T.H(T.ROLES[S.rol].n)}</b> no tiene acceso a «${T.H(a[2])}». Cada rol ve solo lo que necesita para su trabajo.</p><a class="btn" href="#/">← Inicio</a></section>`;
  else html=T.V[c]?T.V[c]():`<section class="hero"><span class="chip">Hoja de ruta</span><h1>${a[1]} ${T.H(a[2])}</h1><p class="sub">${T.H(a[3])}</p><a class="btn" href="#/">← Inicio</a></section>`;
- el.innerHTML='<div class="ficticio" role="note">Datos ficticios · demostración</div>'+html;el.dataset.vista=(c&&a)?c:"inicio";window.scrollTo(0,0);
+ el.innerHTML=((T.banner&&T.banner(c))||'<div class="ficticio" role="note">Datos ficticios · demostración</div>')+html;el.dataset.vista=(c&&a)?c:"inicio";window.scrollTo(0,0);
  document.querySelectorAll(".nav a").forEach(x=>x.classList.toggle("on",x.getAttribute("href")=="#/"+c));
  const h=T.after[c];h&&T.puede(c)&&h()};
 T.after={};

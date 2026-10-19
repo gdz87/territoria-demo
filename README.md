@@ -1,4 +1,4 @@
-# Territoria · maqueta v0.7 (datos ficticios)
+# Territoria · maqueta v0.8 (datos ficticios)
 
 Demo navegable de la suite de campaña multicampaña. Publicada en https://gdz87.github.io/territoria-demo/ con aprobación de Germán. Todos los datos son ficticios: candidata "Laura Camargo Niño", partido "Movimiento Raíces Boyacenses", fecha del escenario 20-ago-2027.
 
