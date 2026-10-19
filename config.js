@@ -15,7 +15,7 @@ window.CONFIG = {
     propagandaEspacioPublico: "2027-07-31",          // ~3 meses antes (Ley 1475, art. 35)
     propagandaMedios: "2027-09-01"                   // ~60 días antes (Ley 1475, art. 35); redes tratadas como medios (por verificar)
   },
-  electoral: { curules: 16, umbralPctCociente: 50, tasaConversion: 0.65, participacion: 0.52 },  // curules y umbral POR VERIFICAR
+  electoral: { curules: 15, fuenteCurules: "Registraduría · visor estadisticaselectorales, total_seat=15 (Asamblea de Boyacá 2019 y 2023); consulta 19-oct-2026", umbralPctCociente: 50, tasaConversion: 0.65, participacion: 0.52 },  // v0.9: 15 curules con fuente (el perfil de 16 era obsoleto); umbral 50 % del cuociente (Constitución art. 263)
   finanzas: { topeLista: 3200000000, candidatosLista: 16 },   // tope ficticio; el real lo fija el CNE en enero de 2027
   privacidad: {                                       // Aviso v2.0 — plantilla, debe revisarlo un abogado
     version: "Aviso v2.0",

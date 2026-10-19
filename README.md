@@ -1,12 +1,20 @@
-# Territoria · maqueta v0.8 (campaña ficticia; datos territoriales reales)
+# Territoria · maqueta v0.9 (campaña ficticia; datos territoriales y electorales reales)
 
 Demo navegable de la suite de campaña multicampaña. Publicada en https://gdz87.github.io/territoria-demo/ con aprobación de Germán. La campaña de ejemplo es ficticia: candidata "Laura Camargo Niño", partido "Movimiento Raíces Boyacenses", fecha del escenario 20-ago-2027.
 
-v0.8: la app «Programa y territorio» usa datos territoriales **reales y públicos** de Boyacá (DNP, DANE, SGR y planes de desarrollo), cada uno con fuente, página y fecha de corte (19-oct-2026). `dist/territoria-demo.html` es la versión liviana y carga `dist/programa_necesidades.js` si está junto a ella; `dist/territoria-demo-completa.html` lleva todo en un solo archivo.
+v0.9: se suma el Histórico electoral con resultados reales, públicos y agregados de la Registraduría. `dist/territoria-demo.html` es la versión liviana y carga `dist/programa_necesidades.js` y `dist/electoral_mesas.js` si están junto a ella; `dist/territoria-demo-completa.html` lleva todo en un solo archivo.
 
 - Para abrirla: `python3 -m http.server 8123` en esta carpeta, o abrir `dist/territoria-demo.html` (un solo archivo que funciona sin internet).
 - Apps: Tablero (embudo de votos), Estrategia (calculadora con cifra repartidora), Red (árbol por niveles), Simpatizantes (consentimientos y derechos del titular), Territorio (123 municipios), Centro de redes, Asistente IA, Día E (E-14 y reclamaciones), Finanzas, Cumplimiento. Una tarjeta de Hoja de ruta reúne lo que falta.
 - Asistente IA: funciona en modo simulado sin clave. También acepta una clave propia de Gemini o un código de acceso al proxy (`/ia` del Worker de fase1). Tiene guardas contra difamación, desinformación y microsegmentación con datos sensibles, y aplica el art. 35. Todo lo que produce queda marcado como hecho con IA y exige revisión humana.
+- v0.9 (Histórico electoral, `#/HISTORICO`):
+  - Resultados **reales, públicos y agregados** de la Registraduría (Boyacá 2018-2023): participación, abstención, blanco, nulos y no marcados por municipio, zona y puesto; tendencia; mapa; simulador D'Hondt con 15 curules y su fuente; metas en 3 escenarios contra la cifra repartidora (sin atípicos); bastiones; testigos por riesgo (solo del equipo); participación ciudadana legal; Día E (E-14 vs histórico y vs E-24); cruce con el tablero (correlación, no causalidad); calidad, fuentes y hashes; XLSX y PDF con trazabilidad.
+  - Regla dura: nada se cruza con el CRM, no se infiere el voto de nadie y no se analizan mesas o puestos con menos de 10 votantes.
+  - Archivos: `historico.js`, `historico_prog.js` (indicadores electorales en el tablero de PROGRAMA), `electoral_datos.js` (581 KB) y `electoral_mesas.js` (680 KB, se carga bajo demanda; embebido como JSON en el build completo).
+- v0.8 (Programa y territorio, `#/PROGRAMA`):
+  - Tablero territorial de Boyacá con datos **reales y públicos**: cada cifra muestra fuente, página y fecha de corte (19-oct-2026). Incluye filtros, comparación, búsqueda por tema y ficha exportable.
+  - Generador de programa de gobierno o agenda voluntaria con la evidencia del tablero, la regla de competencias, las alertas A-01..A-10, doble firma, líneas rojas e IA local apagada por defecto. Exporta a DNP, Registraduría o agenda, web y agenda legislativa. En «Después de ganar» genera el borrador del plan de desarrollo.
+  - Archivos: `programa.js`, `programa2.js`, `programa_motor.js`, `programa_reglas.js` (generado), `programa_datos.js` (457 KB) y `programa_necesidades.js` (1,93 MB, se carga bajo demanda).
 - v0.7 (Lote 1c):
   - Divipole: 123 municipios en el mapa y municipio asignado automáticamente según la dirección declarada (la dirección no se guarda; sin puestos inventados).
   - «Mis datos» (`#/mis-datos`): el titular revoca en 3 clics con código o en 2 con el enlace del mensaje. Plazos de 10 y 15 días hábiles con festivos 2026-2027.
