@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="description" content="Demo de la suite de gestión de campañas (datos ficticios)">
+<title>Demo</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#/" aria-label="Inicio"><i>◆</i><span><span id="marca">Territoria</span><small id="lema"></small></span></a>
+  <span class="sp"></span>
+  <button id="sync" class="chip sync" type="button" title="Simular conexión / sin conexión" style="min-height:44px"><span class="dot"></span>En línea</button>
+  <label for="rol" class="sr" style="position:absolute;left:-9999px">Rol</label>
+  <select id="rol" class="btn" aria-label="Rol de demostración"></select>
+  <button id="tema" class="btn" type="button" aria-label="Cambiar tema">🌙</button>
+  <button id="reset" class="btn" type="button" aria-label="Restablecer demo" title="Restablecer demo">↺</button>
+</header>
+<main id="main" tabindex="-1"></main>
+<nav class="nav" aria-label="Navegación principal">
+  <a href="#/"><b>🏠</b>Inicio</a><a href="#/TABLERO"><b>📊</b>Tablero</a><a href="#/CONTENIDO"><b>🎬</b>Redes</a><a href="#/IA"><b>🤖</b>IA</a><a href="#/DIAE"><b>🗳️</b>Día E</a>
+</nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script src="config.js"></script>
+<script src="sha256.js"></script>
+<script src="municipios_boyaca.js"></script>
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script src="views1.js"></script>
+<script src="views2.js"></script>
+<script src="ia.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
