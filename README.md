@@ -1,6 +1,8 @@
-# Territoria · maqueta v0.8 (datos ficticios)
+# Territoria · maqueta v0.8 (campaña ficticia; datos territoriales reales)
 
-Demo navegable de la suite de campaña multicampaña. Publicada en https://gdz87.github.io/territoria-demo/ con aprobación de Germán. Todos los datos son ficticios: candidata "Laura Camargo Niño", partido "Movimiento Raíces Boyacenses", fecha del escenario 20-ago-2027.
+Demo navegable de la suite de campaña multicampaña. Publicada en https://gdz87.github.io/territoria-demo/ con aprobación de Germán. La campaña de ejemplo es ficticia: candidata "Laura Camargo Niño", partido "Movimiento Raíces Boyacenses", fecha del escenario 20-ago-2027.
+
+v0.8: la app «Programa y territorio» usa datos territoriales **reales y públicos** de Boyacá (DNP, DANE, SGR y planes de desarrollo), cada uno con fuente, página y fecha de corte (19-oct-2026). `dist/territoria-demo.html` es la versión liviana y carga `dist/programa_necesidades.js` si está junto a ella; `dist/territoria-demo-completa.html` lleva todo en un solo archivo.
 
 - Para abrirla: `python3 -m http.server 8123` en esta carpeta, o abrir `dist/territoria-demo.html` (un solo archivo que funciona sin internet).
 - Apps: Tablero (embudo de votos), Estrategia (calculadora con cifra repartidora), Red (árbol por niveles), Simpatizantes (consentimientos y derechos del titular), Territorio (123 municipios), Centro de redes, Asistente IA, Día E (E-14 y reclamaciones), Finanzas, Cumplimiento. Una tarjeta de Hoja de ruta reúne lo que falta.
