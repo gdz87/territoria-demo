@@ -105,3 +105,18 @@ fieldset.canales{border:1px solid var(--ln);border-radius:12px;padding:6px 10px;
 .tlh{position:absolute;bottom:-14px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--ok)}.tlh.bad{background:var(--er)}
 .fase.actual{outline:2px solid var(--ok)}.locked{border:1px dashed var(--wa)}
 @media (max-width:720px){.card[style*="grid-column:span 2"]{grid-column:auto!important}.tlf span{font-size:10px}}
+/* v0.5 · Lote 1a */
+.qrbox{background:#fff;border-radius:12px;padding:8px;width:220px;max-width:100%;margin:10px auto}.qrbox svg{display:block;width:100%;height:auto}
+.grafo{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}.gnodo{border:1px solid var(--bd,#3333);border-radius:10px;padding:8px}.gh{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.gpunto{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:700}.gpunto.ok{background:var(--ok);color:#fff}.gpunto.pend{border:2px dashed var(--wa);color:var(--wa)}
+
+/* v0.6 · 010 rótulo «Conteo interno, no oficial» */
+.rotulo-no-oficial{margin:8px 0 12px;padding:8px 12px;border-radius:10px;border:1px dashed var(--wa);background:color-mix(in srgb,var(--wa) 12%,transparent);font-size:.86rem;line-height:1.35}
+.msg .rotulo-no-oficial{margin:6px 0}
+.modal .rotulo-no-oficial{margin-top:0}
+/* v0.7 · Lote 1c */
+.alta-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--pc,#0f9d76) 16%,transparent);border:1px solid color-mix(in srgb,var(--pc,#0f9d76) 45%,transparent);font-size:14px}
+.alta-bar .sp{flex:1}
+#mis-datos input,#al-paso input,#al-paso select,#al-paso textarea{width:100%}
+#al-paso .al-inv input,#al-paso .al-inv select{width:auto}
+#md-rad.ok,#al-ok.ok{border-color:#0f9d76}

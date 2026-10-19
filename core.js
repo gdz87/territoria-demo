@@ -41,8 +41,8 @@ T.modal=(html,opt)=>{const m=document.createElement("div");m.className="modal";m
 T.descargar=(nombre,contenido,tipo)=>{const b=contenido instanceof Blob?contenido:new Blob([contenido],{type:tipo||"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=nombre;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)};
 T.huella=h=>S.tecnica?`<div class="hash">SHA-256: ${h}</div>`:`<div class="muted small">🔒 Huella digital guardada (registro a prueba de alteraciones)</div>`;
 // Roles y permisos (matriz)
-const LIDER=D.red.find(n=>n.rol=="Líder"&&n.mun=="Paipa"&&D.red.some(x=>x.padre==n.id))||D.red.find(n=>n.rol=="Líder");
-const CMUN=D.red.find(n=>n.rol=="Coordinador municipal"&&n.mun=="Paipa")||D.red.find(n=>n.rol=="Coordinador municipal");
+const LIDER=D.red.find(n=>n.rol=="Líder"&&n.mun=="Paipa"&&D.red.some(x=>x.padre==n.id))||D.red.find(n=>n.rol=="Líder")||D.red[D.red.length-1];
+const CMUN=D.red.find(n=>n.rol=="Coordinador municipal"&&n.mun=="Paipa")||D.red.find(n=>n.rol=="Coordinador municipal")||D.red[D.red.length-1];
 T.LIDER=LIDER;T.CMUN=CMUN;
 T.ROLES={candidato:{n:"Candidata",apps:"*"},gerente:{n:"Gerente de campaña",apps:"*"},contador:{n:"Contador(a)",apps:["FINANZAS","CUMPLIMIENTO"]},cm:{n:"Community manager",apps:["CONTENIDO","IA","TABLERO"]},juridico:{n:"Jurídico y cumplimiento",apps:["CUMPLIMIENTO","DIAE","CRM"]},
  ctestigos:{n:"Coordinador de testigos",apps:["DIAE","TERRITORIO"]},coordmun:{n:"Coord. municipal ("+CMUN.mun+")",apps:["RED","CRM","TERRITORIO"],nodo:CMUN.id},lider:{n:"Líder ("+LIDER.mun+")",apps:["RED","CRM","TERRITORIO"],nodo:LIDER.id},testigo:{n:"Testigo electoral",apps:["DIAE"]}};

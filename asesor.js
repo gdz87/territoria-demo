@@ -1,4 +1,4 @@
-/* Territoria v0.4 · App «Asesor»: asesor de campaña con RAG sobre la base verificada (fase1/asesor).
+/* Territoria v0.4–v0.5 · App «Asesor»: asesor de campaña con RAG sobre la base verificada (fase1/asesor).
    - Demo pública: motor LOCAL (BM25 sobre window.ASESOR_KB + reglas de window.ASESOR_NUCLEO), sin claves ni modelo.
    - Con servidor: si CONFIG.asesor.endpoint existe, o la IA está en modo «código» con proxy, llama a POST /asesor del Worker
      (el Worker valida el código, la activación por campaña, filtra agregados k>=10 y valida el JSON); si falla, vuelve al motor local.
@@ -17,17 +17,20 @@ S.ase=T.ls("ase_chat",[]);const save0=T.save;T.save=()=>{save0();T.lsSet("ase_ch
 const AVISO="Contenido generado con IA por el Asesor de "+C.marca+". Es orientación, no asesoría jurídica ni fuente oficial: requiere revisión y decisión de una persona de la campaña.";
 const encendido=()=>!!(T.IA&&T.IA.on?T.IA.on("asesor"):S.iaF&&S.iaF.asesor&&S.iaF.asesor.on);
 // ---------- Contexto agregado (k >= 10), calculado con el alcance del rol ----------
-T.asesorContexto=()=>{const pv=T.personasVisibles().filter(p=>!p.oposicion),a=T.alcance(),red=D.red.filter(n=>!a||a.has(n.id)),sum=k=>red.reduce((s,n)=>s+(+n[k]||0),0);
+T.asesorContexto=()=>{const pv=T.personasVisibles().filter(p=>!p.oposicion&&!p.retenido),a=T.alcance(),red=D.red.filter(n=>!a||a.has(n.id)),sum=k=>red.reduce((s,n)=>s+(+n[k]||0),0);
  const porM={};pv.forEach(p=>{porM[p.mun]=(porM[p.mun]||0)+1});
- const conAf=pv.filter(p=>p.consent&&p.consent.estado=="vigente"&&p.consent.afinidad),ap={n:conAf.length};["Comprometido","Simpatizante","Indeciso","Voluntario"].forEach(v=>ap["apoyo_"+N.norm(v)]=conAf.filter(p=>p.apoyo==v).length);
+ // v0.5: estado de relación y apoyo declarado por el titular, solo en conteos (nunca por persona)
+ const est={};pv.forEach(p=>{if(p.estado&&p.estado!="baja")est[p.estado]=(est[p.estado]||0)+1});const TS=T.TASAS||{verificado:.4,confirmado:.8};
+ const vst=pv.filter(p=>["autorizado","contactado"].includes(p.estado)).length,conf=pv.filter(p=>p.apoyoDecl&&p.consent&&p.consent.estado=="vigente"&&p.consent.afinidad).length;
+ const emb={prometido:pv.filter(p=>p.estado=="referido_pendiente").length,verificado:vst,confirmado:conf,voto_estimado:T.votoEstimado?T.votoEstimado(vst,conf,pv.filter(p=>["autorizado","contactado"].includes(p.estado)&&p.apoyoDecl&&p.consent&&p.consent.estado=="vigente"&&p.consent.afinidad).length):Math.round(vst*TS.verificado+conf*TS.confirmado)};
  const fin=["candidato","gerente","contador"].includes(S.rol)?{tope:C.finanzas.topeLista,tope_estado:"ficticio (el real lo fija el CNE)",ejecutado:(S.gastos||[]).reduce((s,g)=>s+(+g.valor||0),0)}:{};
  const crudo={campana_nombre:C.campana,cargo:C.cargo,circunscripcion:"Boyacá",territorio:"Boyacá (123 municipios)",modalidad_lista:"lista con voto preferente",fecha_hoy:C.fechaDemo,fecha_eleccion:C.fechaEleccion,fecha_eleccion_estado:"por verificar",fase_actual:C.fechaDemo>=C.calendario.propagandaEspacioPublico?"campaña (propaganda en espacio público)":"precampaña",candidato_inscrito:C.fechaDemo>=C.calendario.inscripcionCandidata?"sí":"no",
   rol_usuario:T.ROLES[S.rol].n,alcance_usuario:a?"subárbol de la red ("+(T.ROLES[S.rol].n)+")":"campaña",fecha_corte_tablero:C.fechaDemo,
   indicadores:{personas_en_alcance:pv.length,prometidos:sum("prometidos"),verificados:sum("verificados"),lideres_activos:red.filter(n=>n.rol=="Líder").length,registros_autorizados:pv.filter(p=>p.consent&&p.consent.estado=="vigente").length,
-   por_municipio:Object.entries(porM).map(([m,n])=>({municipio:m,n})).sort((x,y)=>y.n-x.n).slice(0,12),apoyo_agregado:ap,...fin}};
+   por_municipio:Object.entries(porM).map(([m,n])=>({municipio:m,n})).sort((x,y)=>y.n-x.n).slice(0,12),por_estado_relacion:est,embudo:emb,...fin}};
  // Filtro del servidor (mismo código que el Worker): lista blanca + celdas con menos de K personas → "<K"
  const r=N.filtrarAgregados(crudo,K);const c=r.contexto;
- if(typeof crudo.indicadores.personas_en_alcance=="number"&&crudo.indicadores.personas_en_alcance<K){const ind=c.indicadores;["personas_en_alcance","registros_autorizados"].forEach(k=>{if(ind[k]!==undefined&&ind[k]!==0)ind[k]="<"+K});ind.por_municipio=[];ind.apoyo_agregado={n:"<"+K}}
+ if(typeof crudo.indicadores.personas_en_alcance=="number"&&crudo.indicadores.personas_en_alcance<K){const ind=c.indicadores;["personas_en_alcance","registros_autorizados"].forEach(k=>{if(ind[k]!==undefined&&ind[k]!==0)ind[k]="<"+K});ind.por_municipio=[];ind.por_estado_relacion={};ind.embudo={n:"<"+K}}
  return {contexto:c,suprimidas:r.informe.suprimidas}};
 // ---------- Motor local (demo sin IA) ----------
 const FR=KB.fragmentos.filter(f=>f.estado!=="obsoleto"),POR=new Map(FR.map(f=>[f.id,f])),bm=N.crearBM25(FR);
@@ -72,7 +75,7 @@ async function responder(q){const hist=S.ase.slice(-6),ctx=T.asesorContexto().co
 const lista=(t,a)=>a&&a.length?`<h3>${t}</h3><ul>${a.map(x=>`<li>${H(x)}</li>`).join("")}</ul>`:"";
 function tarjeta(m,i){const o=m.o||{},rz=o.rechazo&&o.rechazo.aplica,ra=o.remision_abogado&&o.remision_abogado.aplica;
  return `<div class="msg a ase-res${rz?" rz":""}"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:6px"><span class="chip ia">IA · Asesor</span><span class="chip ${rz?"er":o.tipo=="privacidad"?"wa":""}">${H(rz?"Línea roja":o.tipo||"respuesta")}</span><span class="chip">${m.modo=="servidor"?"Servidor":"Demostración local"}</span></div>
- <p class="ase-corta"><b>${H(o.respuesta_corta)}</b></p>
+ <p class="ase-corta"><b>${H(o.respuesta_corta)}</b></p>${T.cifraVotos&&T.cifraVotos(JSON.stringify({...o,fuentes:undefined}))?T.rotuloHTML():""}
  ${rz?`<div class="warn"><b>Por qué no:</b> ${H(o.rechazo.razon||"")}<br><b>Riesgo:</b> ${H(o.rechazo.riesgo||"")}</div><h3>Alternativas legales</h3><div class="ase-cards">${(o.rechazo.alternativas||[]).map(a=>`<div class="ase-card ok">✓ ${H(a)}</div>`).join("")}</div>${o.rechazo.si_ya_ocurrio?`<p class="small"><b>Si ya ocurrió:</b> ${H(o.rechazo.si_ya_ocurrio)}</p>`:""}`:""}
  ${lista("Diagnóstico",o.diagnostico)}${o.objetivo?`<h3>Objetivo</h3><p>${H(o.objetivo)}</p>`:""}
  ${o.estrategia&&o.estrategia.length?`<h3>Recomendaciones</h3><div class="ase-cards">${o.estrategia.map(x=>`<div class="ase-card">${H(x)}</div>`).join("")}</div>`:""}
@@ -85,11 +88,11 @@ function tarjeta(m,i){const o=m.o||{},rz=o.rechazo&&o.rechazo.aplica,ra=o.remisi
  ${ra?`<div class="row" style="margin-top:8px"><button class="btn sm pri" type="button" data-aseabog="${i}">⚖ Consultar abogado</button></div>`:""}<p class="muted small ase-aviso">🤖 ${H(m.aviso||AVISO)}</p></div>`}
 function verContexto(){const {contexto:c,suprimidas:s}=T.asesorContexto(),ind=c.indicadores||{},v=x=>x===undefined?"—":typeof x=="object"?(Array.isArray(x)?(x.length?x.map(y=>Object.values(y).join(": ")).join(" · "):"sin celdas ≥ "+K):Object.entries(x).map(([k,y])=>k+": "+y).join(" · ")):String(x);
  return `<div class="card" id="ase-ctx"><h2>Lo que ve el asesor</h2><p class="muted small">Solo agregados de al menos <b>${K}</b> personas, calculados en el servidor con el alcance de tu rol (${H(T.ROLES[S.rol].n)}). Nunca nombres, teléfonos ni la opinión de una persona.</p>
- <div class="list small">${[["Alcance",c.alcance_usuario],["Fase",c.fase_actual],["Personas en tu alcance",ind.personas_en_alcance],["Prometidos (red)",ind.prometidos],["Verificados (red)",ind.verificados],["Registros autorizados",ind.registros_autorizados],["Por municipio",ind.por_municipio],["Apoyo agregado (con autorización)",ind.apoyo_agregado],...(ind.tope!==undefined?[["Tope (ficticio)",T.cop(ind.tope)],["Ejecutado",T.cop(ind.ejecutado||0)]]:[])].map(([k,x])=>`<div class="row b"><span>${H(k)}</span><b class="ase-v">${H(v(x))}</b></div>`).join("")}</div>
+ <div class="list small">${[["Alcance",c.alcance_usuario],["Fase",c.fase_actual],["Personas en tu alcance",ind.personas_en_alcance],["Prometidos (red)",ind.prometidos],["Verificados (red)",ind.verificados],["Registros autorizados",ind.registros_autorizados],["Por municipio",ind.por_municipio],["Por estado de relación",ind.por_estado_relacion],["Embudo (agregado)",ind.embudo],...(ind.tope!==undefined?[["Tope (ficticio)",T.cop(ind.tope)],["Ejecutado",T.cop(ind.ejecutado||0)]]:[])].map(([k,x])=>`<div class="row b"><span>${H(k)}</span><b class="ase-v">${H(v(x))}</b></div>`).join("")}</div>
  ${s?`<p class="small" style="margin-top:8px">🔒 ${s} celda(s) con menos de ${K} personas suprimidas («&lt;${K}»).</p>`:""}</div>`}
 function verBase(){const cad=caducidad(),ep=endpoint();return `<div class="card"><h2>Base de conocimiento</h2><div class="list small"><div class="row b"><span>Índice</span><b>${H(KB.meta.indice_version)}</b></div><div class="row b"><span>Corte</span><b>${T.fecha(KB.meta.fecha_corte)}</b></div><div class="row b"><span>Fragmentos</span><b>${KB.meta.n_fragmentos}</b></div><div class="row b"><span>Modo</span><b>${ep?"Servidor (Worker /asesor)":"Demostración local, sin IA"}</b></div></div>
  ${cad.length?`<div class="warn small" style="margin-top:8px" id="ase-cad">⚠ ${cad.map(H).join("<br>")}</div>`:""}<p class="muted small">Las líneas rojas (LR-01 a LR-12) se revisan en cada consulta y no se pueden apagar.</p></div>`}
-const EJ=["¿Cuántos votos necesito para ser diputado en Boyacá?","¿Desde cuándo puedo poner vallas y pautar en Facebook?","Un amigo empresario quiere aportar 80 millones. ¿Se puede?","¿Cuánto presupuesto necesito para dar un mercado por voto?"];
+const EJ=["¿Cuántos votos necesito para ser diputado en Boyacá?","¿Desde cuándo puedo poner vallas y pautar en Facebook?","Un amigo empresario quiere aportar 80 millones. ¿Se puede?","¿Qué debe tener el aviso de privacidad del formulario de registro?"];
 T.V.ASESOR=()=>{const on=encendido();
  const cab=`<section class="hero"><div class="row" style="flex-wrap:wrap;gap:8px"><span class="chip ia">IA</span><span class="chip">Base ${H(KB.meta.indice_version)}</span></div><h1>🧭 Asesor de campaña</h1><p class="sub">Estrategia, plazos y cumplimiento con fragmentos citados. Rechaza las líneas rojas y propone alternativas legales. Orientación, no asesoría jurídica.</p></section>`;
  if(!on)return cab+`<div class="card locked" id="ase-locked" style="margin-top:12px"><h2>🔒 Asesor de campaña: apagado</h2><p class="small">Las funciones de IA vienen <b>apagadas por defecto</b> en cada campaña. El Asesor se activa en <b>Gobierno de IA</b> (candidata, gerente o jurídico), con justificación registrada y la declaración de que el proveedor no entrena con los datos.</p><a class="btn pri" href="#/IA?gobierno">Ir a Gobierno de IA</a></div><div class="grid g2" style="margin-top:12px">${verContexto()}${verBase()}</div>`;
