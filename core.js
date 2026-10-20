@@ -50,7 +50,8 @@ T.puede=a=>{const r=T.ROLES[S.rol];return r.apps==="*"||r.apps.includes(a)};
 T.nodoRol=()=>T.ROLES[S.rol].nodo||null;
 T.subarbol=id=>{const out=[D.red.find(n=>n.id==id)];const r=p=>D.red.filter(n=>n.padre==p).forEach(n=>{out.push(n);r(n.id)});r(id);return out};
 T.alcance=()=>{const n=T.nodoRol();return n?new Set(T.subarbol(n).map(x=>x.id)):null};  // null = sin restricción
-T.personasVisibles=()=>{const a=T.alcance();return S.personas.filter(p=>!a||a.has(p.lider))};
+T.personasVisibles=()=>{const a=T.alcance();if(!a)return S.personas;const nd=D.red.find(n=>n.id==T.nodoRol());return S.personas.filter(p=>a.has(p.lider)&&(!nd||nd.rol!="Líder"||p.mun==nd.mun||p.capturadoPor==S.rol))};  // v0.10: alcance = subárbol del nodo y, para el líder, solo su municipio (Paipa no ve Tunja)
+T.veSolicitudes=()=>["juridico","gerente"].includes(S.rol);  // v0.10: solo Jurídico y Gerente ven/responden solicitudes de titulares
 // Apps
 T.APPS=[["TABLERO","📊","Tablero de la candidata","Embudo de votos y alertas"],["ESTRATEGIA","🎯","Meta y cifra repartidora","Calculadora de curules y preferentes"],["RED","🌳","Red de líderes","Árbol, ranking y promesas vs. verificados"],["CRM","👥","Simpatizantes","Fichas, autorizaciones y derechos"],["TERRITORIO","🗺️","Mapa de Boyacá","123 municipios, avance y potencial"],["CONTENIDO","🎬","Centro de redes","Compositor, aprobación y calendario"],["IA","🤖","Asistente IA","Contenido, propuestas, documentos y chat"],["DIAE","🗳️","Día electoral","Testigos, E-14 y reclamaciones"],["FINANZAS","💰","Finanzas y Cuentas Claras","Fuentes, topes y exportación"],["CUMPLIMIENTO","🛡️","Cumplimiento","Ley 1581, solicitudes y bitácora"]];
 T.ROADMAP=[["VOLUNTARIOS","🙋","Voluntariado","Tareas, turnos, puerta a puerta e insignias sin premios."],["EVENTOS","📅","Agenda y eventos","Agenda con tiempos entre municipios y asistencia por QR."],["COMUNICACIONES","💬","Mensajes","SMS, correo y WhatsApp oficial solo con autorización."],["ESCUCHA","👂","Escucha de redes","Menciones y alertas de bulos con fuentes oficiales (fase 2)."],["ENCUESTAS","📝","Encuestas internas","Anónimas y de uso interno, no publicables."],["ADMIN","⚙️","Administración multi-campaña","Campañas aisladas, planes, alta y cierre con borrado."]];
@@ -66,4 +67,24 @@ T.render=ruta=>{actual=ruta||"";const c=actual.split("?")[0];const el=T.$("#main
 T.after={};
 T.clicks={};T.onClick=(sel,fn)=>{T.clicks[sel]=fn};
 document.addEventListener("click",e=>{for(const sel in T.clicks){const t=e.target.closest(sel);if(t){T.clicks[sel](t,e);return}}});
+// ---------- v0.10: ayudas comunes (ℹ️, avisos no bloqueantes, una sola fuente electoral y de finanzas) ----------
+T.info=txt=>`<button class="info" type="button" data-info="${T.H(txt)}" aria-label="Más información" title="${T.H(txt)}">ℹ️</button>`;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-info]");if(b){e.stopPropagation();T.modal(`<h2>ℹ️ Más información</h2><p class="small">${T.H(b.dataset.info)}</p>`)}},true);
+// Aviso discreto, no bloqueante. Si es grave y el usuario sigue, queda un registro interno silencioso en la bitácora (quién, qué, dato, cuándo).
+T.aviso=(msg)=>{T.toast("⚠ "+msg);let z=document.getElementById("avisos");if(!z){z=document.createElement("div");z.id="avisos";z.className="avisos";z.setAttribute("role","status");document.body.appendChild(z)}const d=document.createElement("div");d.className="aviso";d.dataset.aviso="";d.textContent="⚠ "+msg;z.appendChild(d);setTimeout(()=>d.remove(),6000)};
+T.avisoGrave=(clave,msg,dato)=>{T.aviso(msg);T.log("cumplimiento.aviso_continuado",clave+" · "+msg+(dato?" · dato: "+String(dato).slice(0,120):"")+" · por "+(T.ROLES[S.rol]||{}).n+" ("+S.rol+")")};
+// Tope de gastos individual: parámetro con fuente (no se divide el de la lista)
+T.topeCandidato=()=>{const v=T.ls("tope_cand",null);return +(v&&v.valor)||+C.finanzas.topeCandidato||C.finanzas.topeLista/C.finanzas.candidatosLista};
+// Regla única del 10 % por aportante (Finanzas y Asesor IA)
+T.SINLIM=["Recursos propios","Familiar (hasta 4.º grado)","Crédito entidad financiera","Recursos del partido"];
+T.reglaAporte=a=>{const lim=T.topeCandidato()*0.1;if(T.SINLIM.includes(a.tipo))return{supera:false,lim,acum:0};const acum=(S.aportes||[]).filter(x=>x.ok&&String(x.aportante).toLowerCase()==String(a.aportante).toLowerCase()).reduce((s,x)=>s+(+x.valor||0),0)+(+a.valor||0);return{supera:acum>lim,lim,acum}};
+T.aportesSobreLimite=()=>{const por={};(S.aportes||[]).filter(x=>x.ok&&!T.SINLIM.includes(x.tipo)).forEach(x=>{const k=String(x.aportante).toLowerCase();por[k]=por[k]||{n:x.aportante,v:0};por[k].v+=+x.valor||0});const lim=T.topeCandidato()*0.1;return Object.values(por).filter(x=>x.v>lim)};
+// Única fuente electoral de la suite: Histórico oficial, Asamblea de Boyacá 2023 (Registraduría)
+T.elec=()=>{const E=window.ELECT_DATOS;if(!E)return null;const ci=E.asamblea_cifra.find(c=>c.año==2023),el=E.elecciones.find(e=>e.id=="ASAM2023");if(!ci||!el)return null;
+ return{fuente:"Histórico oficial · Registraduría, Asamblea de Boyacá 2023",potencial:el.potencial,votantes:el.votantes,validos:ci.validos,blanco:ci.blanco,curules:C.electoral.curules,umbral:Math.round(ci.umbral),cifra:Math.round(ci.cifra_repartidora),cuociente:ci.cuociente,participacion:el.votantes/el.potencial,nulosPct:(el.votantes-ci.validos)/el.votantes,blancoPct:ci.blanco/ci.validos}};
+T.estimaVotos=o=>T.calc(o);  // una sola función de estimación (Tablero, Estrategia, Alta, IA)
+// Fecha de elección configurable
+T.fechaEleccion=()=>{const f=T.ls("fecha_eleccion",null);return f||C.fechaEleccion};
+T.diasParaEleccion=()=>Math.ceil((new Date(T.fechaEleccion()+"T08:00:00-05:00")-T.hoy())/864e5);
+T.marcaFecha=()=>C.fechaOficialConfirmada?"":' <span class="chip wa" data-fecha-pend>fecha oficial por confirmar</span>';
 })();

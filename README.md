@@ -1,6 +1,8 @@
-# Territoria · maqueta v0.9 (campaña ficticia; datos territoriales y electorales reales)
+# Territoria · maqueta v0.10 (campaña ficticia; datos territoriales y electorales reales)
 
 Demo navegable de la suite de campaña multicampaña. Publicada en https://gdz87.github.io/territoria-demo/ con aprobación de Germán. La campaña de ejemplo es ficticia: candidata "Laura Camargo Niño", partido "Movimiento Raíces Boyacenses", fecha del escenario 20-ago-2027.
+
+v0.10: IA encendida por defecto (se puede apagar en ⚙️), avisos breves en lenguaje sencillo y solo 4 bloqueos: aportes sobre el límite o de fuentes prohibidas, regalos o transporte para votantes, registro sin autorización de datos y suplantación con IA. Las citas legales están en el ícono ℹ️. Simpatizantes en `#/SIMPATIZANTES`. Una sola fuente electoral para toda la suite (Asamblea de Boyacá 2023: 15 curules, umbral 21.217, cifra repartidora 30.356) y provincias oficiales. Centro de redes ampliado (`redes.js`): 7 redes con vista previa, un post para todas, calendario editorial, guiones e hilos, kit de WhatsApp para líderes, fichas por municipio, campaña contra la abstención, escucha y métricas simuladas, pauta conectada a Finanzas.
 
 v0.9: se suma el Histórico electoral con resultados reales, públicos y agregados de la Registraduría. `dist/territoria-demo.html` es la versión liviana y carga `dist/programa_necesidades.js` y `dist/electoral_mesas.js` si están junto a ella; `dist/territoria-demo-completa.html` lleva todo en un solo archivo.
 
@@ -13,7 +15,7 @@ v0.9: se suma el Histórico electoral con resultados reales, públicos y agregad
   - Archivos: `historico.js`, `historico_prog.js` (indicadores electorales en el tablero de PROGRAMA), `electoral_datos.js` (581 KB) y `electoral_mesas.js` (680 KB, se carga bajo demanda; embebido como JSON en el build completo).
 - v0.8 (Programa y territorio, `#/PROGRAMA`):
   - Tablero territorial de Boyacá con datos **reales y públicos**: cada cifra muestra fuente, página y fecha de corte (19-oct-2026). Incluye filtros, comparación, búsqueda por tema y ficha exportable.
-  - Generador de programa de gobierno o agenda voluntaria con la evidencia del tablero, la regla de competencias, las alertas A-01..A-10, doble firma, líneas rojas e IA local apagada por defecto. Exporta a DNP, Registraduría o agenda, web y agenda legislativa. En «Después de ganar» genera el borrador del plan de desarrollo.
+  - Generador de programa de gobierno o agenda voluntaria con la evidencia del tablero, la regla de competencias, las alertas A-01..A-10, doble firma, líneas rojas e IA local. Exporta a DNP, Registraduría o agenda, web y agenda legislativa. En «Después de ganar» genera el borrador del plan de desarrollo.
   - Archivos: `programa.js`, `programa2.js`, `programa_motor.js`, `programa_reglas.js` (generado), `programa_datos.js` (457 KB) y `programa_necesidades.js` (1,93 MB, se carga bajo demanda).
 - v0.7 (Lote 1c):
   - Divipole: 123 municipios en el mapa y municipio asignado automáticamente según la dirección declarada (la dirección no se guarda; sin puestos inventados).
@@ -24,7 +26,7 @@ v0.9: se suma el Histórico electoral con resultados reales, públicos y agregad
   - Brújula de campaña en el inicio, para todos los roles, con acuse de lectura.
   - Estrategia: objetivo (ganar / posicionarse / participar), meta de abajo hacia arriba con alerta «meta no sustentada» y escenario «si no intervenimos»; plan estrategia → objetivo → táctica → tarea; planificador inverso desde el Día E; hitos con plazos legales; matriz segmento → mensaje → canal → indicador con ficha de transparencia.
   - Tablero: embudo por fase con alertas de desbalance, cuarto de guerra con registro de decisiones y eventos (meta vs. real).
-  - IA apagada por defecto (IA › Gobierno de IA), aviso de IA obligatorio, deepfakes bloqueados, revisión humana en la bitácora y chatbot con respuestas aprobadas.
+  - Aviso de IA obligatorio, deepfakes bloqueados, revisión humana en la bitácora y chatbot con respuestas aprobadas.
   - Segundo canal para pagos ≥ 2 millones y cambios de cuenta (código de demostración: 482917); el Día E solo acepta testigos autenticados en su mesa.
 - Modo presentación: guion de 13 pasos con reinicio.
 - Pruebas: `node test/e2e.js` con el servidor activo (escritorio 1440 y móvil 375). Capturas en `test/shots/`.

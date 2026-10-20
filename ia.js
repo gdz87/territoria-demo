@@ -20,13 +20,14 @@ const RX={
  deepObj:/(rival|contrincante|oponente|otr[oa]\s+candidat|alcalde|gobernador|president|ministr|periodista|fallecid|difunt|muert[oa]|q\.?\s?e\.?\s?p\.?\s?d|in memoriam|ex\s?president|funcionari)/i,
  politica:/(opositor\w*|de\s+(la\s+)?(izquierda|derecha)|petrist\w*|uribist\w*|votantes\s+de\s+otr[oa]s?\s+(partido|lista)s?|simpatizantes\s+de\s+otr|militantes\s+de)/i,
  compra:/(compra de votos|pagar(les)? por (el )?voto|mercados? a cambio|regal(o|ar) .* (votos?|votar)|transporte de votantes|recoger votantes)/i};
-IA.guarda=(texto,tipo)=>{const t=String(texto||"");
+IA.guarda=(texto,tipo)=>{ // v0.10: bloqueos firmes solo para dádivas/compra de votos y suplantación; lo demás es aviso no bloqueante con registro
+const t=String(texto||"");
  if(RX.compra.test(t))return{ok:false,msg:"⛔ No puedo ayudar con eso: ofrecer beneficios o transporte a cambio del voto puede ser delito (C.P., arts. 390 y ss.)."};
  if(RX.deep.test(t)&&RX.deepObj.test(t)){T.log&&T.log("ia.deepfake_bloqueado",t.slice(0,80));return{ok:false,msg:"⛔ No genero ni edito imagen, voz o video de personas reales distintas de la candidata autorizada, en especial rivales, funcionarios o personas fallecidas (deepfake). La suplantación con IA agrava la falsedad personal (Ley 2502 de 2025; C.P., art. 296)."}}
- if(RX.politica.test(t)&&RX.segmentar.test(t))return{ok:false,msg:"⛔ No segmento por opinión política sin autorización explícita del titular (Circular SIC 002/2026, instr. 7, por verificar). Los votantes de otras listas solo se trabajan en agregado."};
- if(RX.difamacion.test(t)&&RX.objetivo.test(t))return{ok:false,msg:"⛔ No genero ataques ni acusaciones contra personas (riesgo de injuria y calumnia). Puedo ayudarte a contrastar propuestas con datos verificables."};
  if(RX.desinfo.test(t))return{ok:false,msg:"⛔ No genero información falsa, montajes ni suplantaciones. Puedo ayudarte con un mensaje basado en hechos y fuentes."};
- if(RX.sensible.test(t)&&RX.segmentar.test(t))return{ok:false,msg:"⛔ No hago microsegmentación con datos sensibles (religión, etnia, salud, orientación sexual, etc.). Puedo escribir un mensaje incluyente para toda la comunidad."};
+ if(RX.politica.test(t)&&RX.segmentar.test(t)){const a="⚠ Ojo: mejor no segmento por opinión política sin autorización explícita del titular (Circular SIC 002/2026, instr. 7, por verificar). Los votantes de otras listas solo se trabajan en agregado.";T.avisoGrave&&T.avisoGrave("ia.aviso",a,t.slice(0,80));return{ok:true,aviso:a}}
+ if(RX.difamacion.test(t)&&RX.objetivo.test(t)){const a="⚠ Ojo: mejor no genero ataques ni acusaciones contra personas (riesgo de injuria y calumnia). Puedo ayudarte a contrastar propuestas con datos verificables.";T.avisoGrave&&T.avisoGrave("ia.aviso",a,t.slice(0,80));return{ok:true,aviso:a}}
+ if(RX.sensible.test(t)&&RX.segmentar.test(t)){const a="⚠ Ojo: mejor no hago microsegmentación con datos sensibles (religión, etnia, salud, orientación sexual, etc.). Puedo escribir un mensaje incluyente para toda la comunidad.";T.avisoGrave&&T.avisoGrave("ia.aviso",a,t.slice(0,80));return{ok:true,aviso:a}}
  return{ok:true}};
 IA.art35=(txt)=>{if(T.hoyISO()<C.calendario.propagandaMedios&&/\bvot(a|e|en|ar)\b|marca(r)? el|tarjet[oó]n|#3/i.test(txt))return `⚠ Ley 1475, art. 35: hoy (${T.fecha(T.hoyISO())}) aún no empieza la propaganda en medios y redes (${T.fecha(C.calendario.propagandaMedios)}). Si pide el voto, márcala como propaganda y prográmala desde esa fecha.`;return ""};
 IA.sistema=()=>`Eres el asistente de la campaña de ${C.candidato} (${C.partido}, partido ficticio) a la ${C.cargo} de Boyacá, elección del ${C.fechaEleccion}. Hoy (escenario) es ${C.fechaDemo}.

@@ -16,7 +16,9 @@ window.CONFIG = {
     propagandaMedios: "2027-09-01"                   // ~60 días antes (Ley 1475, art. 35); redes tratadas como medios (por verificar)
   },
   electoral: { curules: 15, fuenteCurules: "Registraduría · visor estadisticaselectorales, total_seat=15 (Asamblea de Boyacá 2019 y 2023); consulta 19-oct-2026", umbralPctCociente: 50, tasaConversion: 0.65, participacion: 0.52 },  // v0.9: 15 curules con fuente (el perfil de 16 era obsoleto); umbral 50 % del cuociente (Constitución art. 263)
-  finanzas: { topeLista: 3200000000, candidatosLista: 16 },   // tope ficticio; el real lo fija el CNE en enero de 2027
+  finanzas: { topeLista: 3200000000, candidatosLista: 15, topeCandidato: 213000000, fuenteTope: "Valor de ejemplo · pendiente de resolución CNE", estadoTope: "pendiente de resolución CNE" },   // v0.10: tope individual parametrizable (no se divide la lista entre candidatos)
+  fechaOficialConfirmada: false,                     // v0.10: la fecha de elección está por confirmar con la Registraduría
+  modoProduccion: false,                             // v0.10: true = Mis datos y simulacros con mensaje neutro, límite de intentos y sin mostrar códigos
   privacidad: {                                       // Aviso v2.0 — plantilla, debe revisarlo un abogado
     version: "Aviso v2.0",
     responsable: "Campaña Laura Camargo Niño (candidata) — Movimiento Raíces Boyacenses",

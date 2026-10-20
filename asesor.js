@@ -12,7 +12,7 @@ const {C,D,S,H}=T,K=Math.max(10,N.K_MINIMO||10);
 const iIA=T.APPS.findIndex(a=>a[0]=="IA");T.APPS.splice(iIA<0?T.APPS.length:iIA+1,0,["ASESOR","🧭","Asesor de campaña","Estrategia y cumplimiento con fuentes citadas"]);
 ["cm","juridico","contador","coordmun","lider"].forEach(r=>{const x=T.ROLES[r];if(x&&Array.isArray(x.apps)&&!x.apps.includes("ASESOR"))x.apps.push("ASESOR")});
 if(T.IA&&T.IA.FUN)T.IA.FUN.asesor=["Asesor de campaña","Estrategia, plazos y cumplimiento con fragmentos verificados y citados","Agregados de al menos "+K+" personas (nunca datos individuales)","Medio"];
-if(S.iaF&&!S.iaF.asesor)S.iaF.asesor={on:false};   // apagado por defecto, también para quien ya tenía datos guardados
+if(S.iaF&&!S.iaF.asesor)S.iaF.asesor={on:true};   // v0.10: encendido por defecto
 S.ase=T.ls("ase_chat",[]);const save0=T.save;T.save=()=>{save0();T.lsSet("ase_chat",S.ase.slice(-40))};
 const AVISO="Contenido generado con IA por el Asesor de "+C.marca+". Es orientación, no asesoría jurídica ni fuente oficial: requiere revisión y decisión de una persona de la campaña.";
 const encendido=()=>!!(T.IA&&T.IA.on?T.IA.on("asesor"):S.iaF&&S.iaF.asesor&&S.iaF.asesor.on);
@@ -70,7 +70,7 @@ async function responderServidor(q,hist,ctx){const ac=new AbortController(),to=s
   const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw new Error((j.error&&j.error.message)||("HTTP "+r.status));return {o:j.salida,meta:j.meta,aviso:j.aviso_ia,modo:"servidor"}}finally{clearTimeout(to)}}
 async function responder(q){const hist=S.ase.slice(-6),ctx=T.asesorContexto().contexto;
  if(endpoint()){try{return await responderServidor(q,hist,ctx)}catch(e){const o=responderLocal(q,hist);o.advertencias=[...(o.advertencias||[]),"No se pudo usar el servidor del Asesor ("+e.message+"); se respondió en modo demostración."];return {o,modo:"local"}}}
- return {o:responderLocal(q,hist),modo:"local"}}
+ const o=responderLocal(q,hist);const esp=T.asesorEspecial&&T.asesorEspecial(q);if(esp&&o.tipo!="rechazo"){o.respuesta_corta=esp.respuesta_corta;o.diagnostico=esp.diagnostico.concat(o.diagnostico||[]);o.recomendaciones=esp.recomendaciones.concat(o.recomendaciones||[]);o.advertencias=(o.advertencias||[]).concat(esp.advertencias);o.historico=true}T.asesorAvisos&&T.asesorAvisos(q,o);return {o,modo:"local"}}
 // ---------- Vista ----------
 const lista=(t,a)=>a&&a.length?`<h3>${t}</h3><ul>${a.map(x=>`<li>${H(x)}</li>`).join("")}</ul>`:"";
 function tarjeta(m,i){const o=m.o||{},rz=o.rechazo&&o.rechazo.aplica,ra=o.remision_abogado&&o.remision_abogado.aplica;
